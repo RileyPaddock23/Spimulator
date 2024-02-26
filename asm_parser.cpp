@@ -1,8 +1,10 @@
 #include "asm_parser.h"
 
-std::string rg2bin(std::string* rgsts, int num_rg){
+std::string rg2bin(std::string *rgsts, int num_rg)
+{
     std::string bin = "";
-    for(int i = 0; i< num_rg;i++){
+    for (int i = 0; i < num_rg; i++)
+    {
         if (rgsts[i] == "$zero")
             bin += "00000";
         else if (rgsts[i] == "$at")
@@ -71,103 +73,169 @@ std::string rg2bin(std::string* rgsts, int num_rg){
     return bin;
 }
 
-std::string prep_Rtype(std::string* rgsts, int shamt){
-    std::string bin = "";
-    bin += "000000"; //opcode
-    bin+= rg2bin(rgsts,3);//registers
-    bin += dec2bin(shamt).substr(27,5);//shamt
-    return bin;
-}
-std::string prep_Itype(std::string* rgsts, long imm){
-    std::string bin = "";
-    bin+= rg2bin(rgsts,2);
-    bin += dec2bin(imm).substr(16,16);
-    return bin;
-}
-
-std::string cmd_to_bin(std::string inst, std::string* rgsts, int shamt,long imm)
+std::string prep_Rtype(std::string *rgsts, int shamt)
 {
     std::string bin = "";
-    if (inst == "add"){
-        bin += prep_Rtype(rgsts, shamt);
-        bin += "100000";}
-    else if (inst == "addu")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "100001";}
-    else if (inst == "and")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "100100";}
-    else if (inst == "nor")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "100111";}
-    else if (inst == "or")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "100101";}
-    else if (inst == "slt")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "101010";}
-    else if (inst == "sltu")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "101011";}
-    else if (inst == "sll")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "000000";}
-    else if (inst == "sra")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "000011";}
-    else if (inst == "srl")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "000010";}
-    else if (inst == "sub")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "100010";}
-    else if (inst == "subu")
-        {bin += prep_Rtype(rgsts, shamt);
-        bin += "010011";}
-    else if(inst == "addi")
-        {bin += "001000";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "addiu")
-        {bin += "001001";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "lui")
-        {bin += "001111";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "andi")
-        {bin += "001100";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "ori")
-        {bin += "001101";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "slti")
-        {bin += "001010";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "sltiu")
-        {bin += "001011";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "beq")
-        {bin += "000100";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "bne")
-        {bin += "000101";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "lw")
-        {bin += "100011";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "sw")
-        {bin += "101011";
-        bin += prep_Itype(rgsts,imm);}
-    else if(inst == "j")
-        {bin += "000010";
-            bin += dec2bin(imm).substr(6,26);}
-    else if(inst == "jal")
-        {bin += "000011";
-        bin += dec2bin(imm).substr(6,26);}
-    
+    bin += "000000";                     // opcode
+    bin += rg2bin(rgsts, 3);             // registers
+    bin += dec2bin(shamt).substr(27, 5); // shamt
+    return bin;
+}
+std::string prep_Itype(std::string *rgsts, long imm)
+{
+    std::string bin = "";
+    bin += rg2bin(rgsts, 2);
+    bin += dec2bin(imm).substr(16, 16);
+    return bin;
+}
+std::string prep_jr(std::string *rgsts)
+{
+    std::string bin = "";
+    bin += "000000";          // opcode
+    bin += rg2bin(rgsts, 1);  // jump_register
+    bin += "000000000000000"; // 15 zeroes for empty rt, rd, and shamt
     return bin;
 }
 
-void write_machine(std::string filename){
+std::string cmd_to_bin(std::string inst, std::string *rgsts, int shamt, long imm)
+{
+    std::string bin = "";
+    if (inst == "add")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "100000";
+    }
+    else if (inst == "addu")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "100001";
+    }
+    else if (inst == "and")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "100100";
+    }
+    else if (inst == "nor")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "100111";
+    }
+    else if (inst == "or")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "100101";
+    }
+    else if (inst == "slt")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "101010";
+    }
+    else if (inst == "sltu")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "101011";
+    }
+    else if (inst == "sll")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "000000";
+    }
+    else if (inst == "sra")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "000011";
+    }
+    else if (inst == "srl")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "000010";
+    }
+    else if (inst == "sub")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "100010";
+    }
+    else if (inst == "subu")
+    {
+        bin += prep_Rtype(rgsts, shamt);
+        bin += "010011";
+    }
+    else if (inst == "jr")
+    {
+        bin += prep_jr(rgsts);
+        bin += "001000";
+    }
+    else if (inst == "addi")
+    {
+        bin += "001000";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "addiu")
+    {
+        bin += "001001";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "lui")
+    {
+        bin += "001111";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "andi")
+    {
+        bin += "001100";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "ori")
+    {
+        bin += "001101";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "slti")
+    {
+        bin += "001010";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "sltiu")
+    {
+        bin += "001011";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "beq")
+    {
+        bin += "000100";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "bne")
+    {
+        bin += "000101";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "lw")
+    {
+        bin += "100011";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "sw")
+    {
+        bin += "101011";
+        bin += prep_Itype(rgsts, imm);
+    }
+    else if (inst == "j")
+    {
+        bin += "000010";
+        bin += dec2bin(imm).substr(6, 26);
+    }
+    else if (inst == "jal")
+    {
+        bin += "000011";
+        bin += dec2bin(imm).substr(6, 26);
+    }
+
+    return bin;
+}
+
+void write_machine(std::string filename)
+{
     std::ifstream cmdFile;
     std::ofstream rawFile;
     cmdFile.open(filename);
@@ -176,89 +244,62 @@ void write_machine(std::string filename){
     std::string curr_read;
     std::string cmd;
     std::string rgsts[3];
-    while(getline(cmdFile,curr_cmd)){
+    while (getline(cmdFile, curr_cmd))
+    {
         int shamt = 0;
         long imm = 0;
         int startIndex = 0;
         int endIndex = 0;
 
-        //Get command name
-        endIndex = curr_cmd.find(' ',startIndex);
-        cmd = curr_cmd.substr(startIndex,endIndex-startIndex);
-        std::cout << "Curr read: "<<cmd<<"\n";
+        // Get command name
+        endIndex = curr_cmd.find(' ', startIndex);
+        cmd = curr_cmd.substr(startIndex, endIndex - startIndex);
+        std::cout << "Curr read: " << cmd << "\n";
 
-        //Get rs or jump add
-        startIndex = endIndex+1;
-        endIndex = curr_cmd.find(' ',startIndex);
-        curr_read = curr_cmd.substr(startIndex,endIndex-startIndex);
-        std::cout << "Curr read: "<<curr_read<<"\n";
-        if(curr_read[0]=='$'){
+        // Get rs or jump add
+        startIndex = endIndex + 1;
+        endIndex = curr_cmd.find(' ', startIndex);
+        curr_read = curr_cmd.substr(startIndex, endIndex - startIndex);
+        std::cout << "Curr read: " << curr_read << "\n";
+        if (curr_read[0] == '$')
+        {
             rgsts[0] = curr_read;
 
-            //Get rt
-            startIndex = endIndex+1;
-            endIndex = curr_cmd.find(' ',startIndex);
-            rgsts[1] = curr_cmd.substr(startIndex,endIndex-startIndex);
-            std::cout << "Curr read: "<<curr_read<<"\n";
-            //get either rd or imm or shamt
-            startIndex = endIndex+1;
-            endIndex = curr_cmd.find(" ",startIndex);
-            curr_read = curr_cmd.substr(startIndex,endIndex-startIndex);
-            std::cout << "Curr read: "<<curr_read<<"\n";
-            if(curr_read[0]=='$'){
+            // Get rt
+            startIndex = endIndex + 1;
+            endIndex = curr_cmd.find(' ', startIndex);
+            rgsts[1] = curr_cmd.substr(startIndex, endIndex - startIndex);
+            std::cout << "Curr read: " << curr_read << "\n";
+            // get either rd or imm or shamt
+            startIndex = endIndex + 1;
+            endIndex = curr_cmd.find(" ", startIndex);
+            curr_read = curr_cmd.substr(startIndex, endIndex - startIndex);
+            std::cout << "Curr read: " << curr_read << "\n";
+            if (curr_read[0] == '$')
+            {
                 rgsts[2] = curr_read;
-            }else{
-                if(cmd == "sll" | cmd == "srl" |cmd == "sra"){
-                    shamt = stoi(curr_read);
-                }else{
-                    imm = stol(curr_read);
+            }
+            else
+            {
+                if (cmd == "sll" | cmd == "srl" | cmd == "sra")
+                {
+                    shamt = stoi(curr_read); // string to int
+                }
+                else
+                {
+                    imm = stol(curr_read); // string to int
                 }
             }
-
-        }else{
-            imm = stol(curr_read);
+        }
+        else
+        {
+            imm = stol(curr_read); // string to long
         }
 
-        std::string bin_cmd = cmd_to_bin(cmd,rgsts,shamt, imm);
-        rawFile << bin2hex(bin_cmd)<<"\n";
+        std::string bin_cmd = cmd_to_bin(cmd, rgsts, shamt, imm);
+        rawFile << bin2hex(bin_cmd) << "\n";
     }
     cmdFile.close();
     rawFile << "exit";
     rawFile.close();
-
 }
-
-
-
-// std::string Rrgsts[3] = {"$t1", "$t2", "$t2"};
-// std::string Irgsts[2];
-// std::string cmd;
-// cmdFile.open(file);
-
-// Irgsts[0] = "$zero";
-// Irgsts[1] = "$t0";
-// cmd = cmd_to_bin('I',"addi", Irgsts, 0, n);
-// cmdFile << bin2hex(cmd) << "\n";
-
-// Irgsts[1] = "$t1";
-// cmd = cmd_to_bin('I',"addi", Irgsts, 0, 0);
-// cmdFile << bin2hex(cmd) << "\n";
-
-// Irgsts[1] = "$t2";
-// cmd = cmd_to_bin('I',"addi", Irgsts, 0, 0);
-// cmdFile << bin2hex(cmd) << "\n";
-
-// Irgsts[0] = "$t1";
-// Irgsts[1] = "$t1";
-// cmd = cmd_to_bin('I',"addi", Irgsts, 0, 1);
-// cmdFile << bin2hex(cmd) << "\n";
-
-// cmd = cmd_to_bin('R',"add", Rrgsts);
-// cmdFile << bin2hex(cmd) << "\n";
-
-// Irgsts[0] = "$t0";
-// cmd = cmd_to_bin('I',"beq", Irgsts, 0, 7);
-// cmdFile << bin2hex(cmd) << "\n";
-
-// cmd = cmd_to_bin('J',"j", Irgsts, 0, 3);
-// cmdFile << bin2hex(cmd) << "\n";

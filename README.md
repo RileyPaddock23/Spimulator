@@ -3,13 +3,13 @@ This is my spimulator project and here is a little bit about how to use it and h
 USAGE:
 
 NOTE: FOR MEMORY ADDRESSES USE LINE NUMBER
-    (Example: if you start defining a function on line 8 in text.txt, then to go to that function you would use "j 8")
+    (Example: If you have a command on line 8, then to go to that command you would use "j 8")
     (Example: if you have something stored in memory.txt at line 10 you would use ($t1 = 10) "lw $t0 $t1 0)
 
 The implemented commands are:
 R type: add, addu, and, nor, or, slt, sltu, sll, sra, srl, sub, subu
 I type: addi, addiu, andi, lui, ori, slti, sltiu, beq, bne, lw, sw, lhu, sh, lbu, sh
-J type: j, jal
+J type: j, jal, jr
 
 There are 2 ways to use the spimulator the first by just writing a hex file the second by writing in "psuedo-MIPS"
 
